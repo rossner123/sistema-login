@@ -10,6 +10,10 @@ app.use(express.json())
 app.post("/register", (req, res) => {
     const { nome, email, senha } = req.body
 
+    if(nome === "" || email === "" || senha === ""){
+        return res.status(500).json({ error: `Erro ao cadastrar o usuário: Preencha todos os campos`})
+    }
+
     bcrypt.hash(senha, 10, (err, hash) => {
         if(err) return res.status(500).json({ error: 'Erro ao criptografar senha' })
 
@@ -17,7 +21,7 @@ app.post("/register", (req, res) => {
         db.query(sql, [nome, email, hash], (err) => {
             if (err) {
                 console.error(err)
-                return res.status(500).json({ error: 'Erro ao cadastrar usuário' })
+                return res.status(500).json({ error: `Erro ao cadastrar o usuário: ${err.message}`})
               }
             res.status(201).json({ message: 'Usuário cadastrado com sucesso!' })
         })
